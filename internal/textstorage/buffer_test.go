@@ -15,7 +15,7 @@ func TestBufferInsert(t *testing.T) {
 		expected []rune
 	}{
 		`empty buffer`: {
-			buffer:   textstorage.NewBuffer([]rune{0}),
+			buffer:   textstorage.NewBuffer([]rune{}),
 			input:    'x',
 			idx:      0,
 			expected: []rune{'x'},
