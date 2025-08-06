@@ -4,6 +4,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 
 	controller_api "dido/internal/controller"
+	"dido/internal/controller/command"
 )
 
 type Editor struct {
@@ -26,6 +27,7 @@ func NewEditor() Editor {
 	return Editor{
 		window:     window,
 		controller: controller_api.NewController(),
+		run:        true,
 	}
 }
 
@@ -33,9 +35,15 @@ func (e *Editor) Close() {
 	e.window.Destroy()
 }
 
-func (e *Editor) Display() {
+func (e *Editor) Run() {
 	for e.run {
 		event := sdl.PollEvent()
-		_ = e.controller.GetCommand(&event) // _ stands for command
+		cmd := e.controller.GetCommand(event)
+		switch cmd.(type) {
+		case *command.CommandQuit:
+			e.run = false
+		default:
+			cmd.Execute()
+		}
 	}
 }

@@ -12,9 +12,13 @@ func NewController() Controller {
 	return Controller{}
 }
 
-func (*Controller) GetCommand(event *sdl.Event) command.Command {
-	var cmd command.Command
-	cmd = &command.CommandNone{}
+func (*Controller) GetCommand(event sdl.Event) (cmd command.Command) {
+	switch event.(type) {
+	case *sdl.QuitEvent:
+		cmd = &command.CommandQuit{}
+	default:
+		cmd = &command.CommandNone{}
+	}
 
-	return cmd
+	return
 }

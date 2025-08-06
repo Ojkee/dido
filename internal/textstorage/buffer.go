@@ -21,7 +21,10 @@ func (b *Buffer) Insert(r rune, idx int) error {
 }
 
 func (b *Buffer) Delete(idx int) error {
-	b.content = slices.Delete(b.content, idx, idx)
+	if len(b.content) == 0 {
+		return nil
+	}
+	b.content = slices.Delete(b.content, idx, idx+1)
 	return nil
 }
 

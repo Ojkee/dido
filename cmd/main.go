@@ -8,5 +8,5 @@ func main() {
 	editor := editor_api.NewEditor()
 	defer editor.Close()
 
-	editor.Display()
+	editor.Run()
 }

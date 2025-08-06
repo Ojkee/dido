@@ -16,12 +16,12 @@ func NewCommandInsert(text *textstorage.TextStorage, r rune, idx int) CommandIns
 	}
 }
 
-func (ci *CommandInsert) Execute() error {
-	err := (*ci.text).Insert(ci.r, ci.idx)
+func (c *CommandInsert) Execute() error {
+	err := (*c.text).Insert(c.r, c.idx)
 	return err
 }
 
-func (ci *CommandInsert) Undo() error {
-	err := (*ci.text).Delete(ci.idx)
+func (c *CommandInsert) Undo() error {
+	err := (*c.text).Delete(c.idx)
 	return err
 }

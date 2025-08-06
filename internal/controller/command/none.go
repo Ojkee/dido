@@ -6,5 +6,5 @@ func NewCommandNone() CommandNone {
 	return CommandNone{}
 }
 
-func (cn *CommandNone) Execute() error { return nil }
-func (cn *CommandNone) Undo() error    { return nil }
+func (c *CommandNone) Execute() error { return nil }
+func (c *CommandNone) Undo() error    { return nil }

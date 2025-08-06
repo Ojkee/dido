@@ -54,3 +54,47 @@ func TestBufferInsert(t *testing.T) {
 		})
 	}
 }
+
+func TestBufferDelete(t *testing.T) {
+	tests := map[string]struct {
+		buffer   textstorage.Buffer
+		input    rune
+		idx      int
+		expected []rune
+	}{
+		`delete from empty`: {
+			buffer:   textstorage.NewBuffer([]rune{}),
+			idx:      0,
+			expected: []rune{},
+		},
+		`delete first`: {
+			buffer:   textstorage.NewBuffer([]rune{'a', 'b', 'c'}),
+			idx:      0,
+			expected: []rune{'b', 'c'},
+		},
+		`delete last`: {
+			buffer:   textstorage.NewBuffer([]rune{'a', 'b', 'c'}),
+			idx:      2,
+			expected: []rune{'a', 'b'},
+		},
+		`delete in middle`: {
+			buffer:   textstorage.NewBuffer([]rune{'a', 'b', 'c'}),
+			idx:      1,
+			expected: []rune{'a', 'c'},
+		},
+	}
+
+	for name, test := range tests {
+		tt := test
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			if err := tt.buffer.Delete(tt.idx); err != nil {
+				t.Fail()
+			}
+			got := tt.buffer.Get()
+			if !reflect.DeepEqual(*got, tt.expected) {
+				t.Errorf("got: `%s`, expected: `%s`", string(*got), string(tt.expected))
+			}
+		})
+	}
+}
