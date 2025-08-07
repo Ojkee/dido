@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"bytes"
+
 	"github.com/veandco/go-sdl2/sdl"
 
 	"dido/internal/controller/command"
@@ -23,26 +25,12 @@ func (*Controller) GetCommand(
 	switch e := event.(type) {
 	case *sdl.QuitEvent:
 		cmd = command.NewCommandQuit()
-	case *sdl.KeyboardEvent:
-		cmd = GetKeyCommand(e, text, cursor)
+	case *sdl.TextInputEvent:
+		letter := bytes.Runes(e.Text[:1])[0]
+		cmd = command.NewCommandInsert(letter, &text, cursor)
 	default:
 		cmd = command.NewCommandNone()
 	}
 
 	return cmd
-}
-
-func GetKeyCommand(
-	event *sdl.KeyboardEvent,
-	text textstorage.TextStorage,
-	cursor *cursor_api.Cursor,
-) command.Command {
-	switch event.GetType() {
-	case sdl.KEYDOWN:
-		key := event.Keysym.Sym
-		if 'a' <= key && key <= 'z' {
-			return command.NewCommandInsert(&text, rune(key), cursor)
-		}
-	}
-	return command.NewCommandNone()
 }

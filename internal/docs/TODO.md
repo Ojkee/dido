@@ -11,6 +11,7 @@
 - [ ] Config 
     - [ ] Theme
     - [ ] Key mappings
+    - [ ] Custom font
 - [ ] Selection 
 - [ ] Find phrase
 - [ ] Replace phrase

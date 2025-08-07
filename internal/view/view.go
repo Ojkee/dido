@@ -33,9 +33,18 @@ func (v *View) Draw() error {
 		return err
 	}
 
-	bgUint32 := sdl.MapRGB(surface.Format, v.bgColor.R, v.bgColor.G, v.bgColor.B)
-	surface.FillRect(nil, bgUint32)
+	v.drawBackground(surface)
 	return nil
+}
+
+func (v *View) drawBackground(surface *sdl.Surface) {
+	bgUint32 := sdl.MapRGB(
+		surface.Format,
+		v.bgColor.R,
+		v.bgColor.G,
+		v.bgColor.B,
+	)
+	_ = surface.FillRect(nil, bgUint32)
 }
 
 func (v *View) Update() error {

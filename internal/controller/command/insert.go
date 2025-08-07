@@ -6,20 +6,20 @@ import (
 )
 
 type CommandInsert struct {
-	r      rune
 	idx    int
+	r      rune
 	text   *textstorage.TextStorage
 	cursor *cursor_api.Cursor
 }
 
 func NewCommandInsert(
-	text *textstorage.TextStorage,
 	r rune,
+	text *textstorage.TextStorage,
 	cursor *cursor_api.Cursor,
 ) *CommandInsert {
 	return &CommandInsert{
-		r:      r,
 		idx:    cursor.CurrentPos(),
+		r:      r,
 		text:   text,
 		cursor: cursor,
 	}
