@@ -1,48 +1,42 @@
 package command
 
 import (
-	cursor_api "dido/internal/cursor"
-	"dido/internal/textstorage"
+	"dido/internal/context"
 )
 
 type Delete struct {
-	idx    int
-	text   *textstorage.TextStorage
-	cursor *cursor_api.Cursor
-	r      rune
+	idx int
+	ctx *context.Context
+	r   rune
 }
 
-func NewDelete(
-	text *textstorage.TextStorage,
-	cursor *cursor_api.Cursor,
-) *Delete {
+func NewDelete(ctx *context.Context) *Delete {
 	return &Delete{
-		idx:    cursor.CurrentPos(),
-		text:   text,
-		cursor: cursor,
+		idx: ctx.Cursor.CurrentPos() - 1,
+		ctx: ctx,
 	}
 }
 
 func (c *Delete) Execute() error {
-	r, err := (*c.text).At(c.idx)
+	r, err := c.ctx.Buffer.At(c.idx)
 	if err != nil {
 		return err
 	}
 	c.r = r
 
-	err = (*c.text).Delete(c.idx)
+	err = c.ctx.Buffer.Delete(c.idx)
 	if err != nil {
 		return err
 	}
-	c.cursor.MoveLeft()
+	c.ctx.Cursor.MoveLeft()
 	return nil
 }
 
 func (c *Delete) Undo() error {
-	err := (*c.text).Insert(c.r, c.idx)
+	err := c.ctx.Buffer.Insert(c.r, c.idx)
 	if err != nil {
 		return err
 	}
-	c.cursor.Move(c.idx)
+	c.ctx.Cursor.Move(c.idx)
 	return nil
 }

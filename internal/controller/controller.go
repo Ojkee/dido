@@ -5,9 +5,8 @@ import (
 
 	"github.com/veandco/go-sdl2/sdl"
 
+	"dido/internal/context"
 	"dido/internal/controller/command"
-	cursor_api "dido/internal/cursor"
-	"dido/internal/textstorage"
 )
 
 type Controller struct {
@@ -21,19 +20,18 @@ func NewController() Controller {
 }
 
 func (c *Controller) GetCommand(
+	ctx *context.Context,
 	event sdl.Event,
-	text textstorage.TextStorage,
-	cursor *cursor_api.Cursor,
 ) command.Command {
 	switch e := event.(type) {
 	case *sdl.QuitEvent:
 		return command.NewQuit()
 	case *sdl.KeyboardEvent:
-		if cmd := c.specialSignCommand(e, text, cursor); cmd != nil {
+		if cmd := c.specialSignCommand(ctx, e); cmd != nil {
 			return cmd
 		}
 	case *sdl.TextInputEvent:
-		return command.NewInsert(runeOfBytes(e.Text), &text, cursor)
+		return command.NewInsert(ctx, runeOfBytes(e.Text))
 	default:
 		return command.NewNone()
 	}
@@ -46,15 +44,14 @@ func runeOfBytes(b [32]byte) rune {
 }
 
 func (c *Controller) specialSignCommand(
+	ctx *context.Context,
 	event *sdl.KeyboardEvent,
-	text textstorage.TextStorage,
-	cursor *cursor_api.Cursor,
 ) command.Command {
 	commandMap := map[sdl.Keycode]command.Command{
-		sdl.K_RETURN:    command.NewInsert('\n', &text, cursor),
-		sdl.K_TAB:       command.NewInsert('\t', &text, cursor),
-		sdl.K_BACKSPACE: command.NewDelete(&text, cursor),
-		c.DEBUG_KEY:     command.NewLog(*text.Get()),
+		sdl.K_RETURN:    command.NewInsert(ctx, '\n'),
+		sdl.K_TAB:       command.NewInsert(ctx, '\t'),
+		sdl.K_BACKSPACE: command.NewDelete(ctx),
+		c.DEBUG_KEY:     command.NewLog(*ctx.Buffer.Get()),
 	}
 
 	switch event.GetType() {

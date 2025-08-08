@@ -1,7 +1,7 @@
 # TODO
 
 ## Roadmap
-- [ ] Appending Uppercase
+- [x] Appending Uppercase
 - [ ] Display letters on the screen
 - [ ] Undo/Redo 
     - [ ] Display tree
@@ -17,7 +17,13 @@
 - [ ] Replace phrase
 
 ## Bugs
+- [x] Delete Command panics
 
 ## Extra
 - [ ] Coloring buffer
 
+
+## Current tasks
+- [ ] Basic char displaying
+- [x] Refacotor ctx
+- [x] Fix delete

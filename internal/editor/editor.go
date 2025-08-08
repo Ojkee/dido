@@ -3,10 +3,9 @@ package editor
 import (
 	"github.com/veandco/go-sdl2/sdl"
 
+	"dido/internal/context"
 	controller_api "dido/internal/controller"
 	"dido/internal/controller/command"
-	cursor_api "dido/internal/cursor"
-	"dido/internal/textstorage"
 	view_api "dido/internal/view"
 )
 
@@ -14,8 +13,7 @@ type Editor struct {
 	view       view_api.View
 	controller controller_api.Controller
 	run        bool
-	buffer     textstorage.Buffer
-	cursor     cursor_api.Cursor
+	ctx        context.Context
 }
 
 func NewEditor() Editor {
@@ -23,8 +21,7 @@ func NewEditor() Editor {
 		view:       view_api.NewView(),
 		controller: controller_api.NewController(),
 		run:        true,
-		buffer:     textstorage.NewBuffer([]rune{}),
-		cursor:     cursor_api.NewCursor(),
+		ctx:        context.NewContext(),
 	}
 }
 
@@ -36,7 +33,7 @@ func (e *Editor) Run() {
 	for e.run {
 		event := sdl.WaitEvent()
 
-		cmd := e.controller.GetCommand(event, &e.buffer, &e.cursor)
+		cmd := e.controller.GetCommand(&e.ctx, event)
 		switch cmd.(type) {
 		case *command.Quit:
 			e.run = false

@@ -1,44 +1,40 @@
 package command
 
 import (
-	cursor_api "dido/internal/cursor"
-	"dido/internal/textstorage"
+	"dido/internal/context"
 )
 
 type Insert struct {
-	idx    int
-	text   *textstorage.TextStorage
-	cursor *cursor_api.Cursor
-	r      rune
+	idx int
+	r   rune
+	ctx *context.Context
 }
 
 func NewInsert(
+	ctx *context.Context,
 	r rune,
-	text *textstorage.TextStorage,
-	cursor *cursor_api.Cursor,
 ) *Insert {
 	return &Insert{
-		idx:    cursor.CurrentPos(),
-		r:      r,
-		text:   text,
-		cursor: cursor,
+		idx: ctx.Cursor.CurrentPos(),
+		r:   r,
+		ctx: ctx,
 	}
 }
 
 func (c *Insert) Execute() error {
-	err := (*c.text).Insert(c.r, c.idx)
+	err := c.ctx.Buffer.Insert(c.r, c.idx)
 	if err != nil {
 		return err
 	}
-	c.cursor.MoveRight()
+	c.ctx.Cursor.MoveRight()
 	return nil
 }
 
 func (c *Insert) Undo() error {
-	err := (*c.text).Delete(c.idx)
+	err := c.ctx.Buffer.Delete(c.idx)
 	if err != nil {
 		return err
 	}
-	c.cursor.Move(c.idx)
+	c.ctx.Cursor.Move(c.idx)
 	return nil
 }
