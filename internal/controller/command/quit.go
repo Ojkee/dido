@@ -1,10 +1,10 @@
 package command
 
-type CommandQuit struct{}
+type Quit struct{}
 
-func NewCommandQuit() *CommandQuit {
-	return &CommandQuit{}
+func NewQuit() *Quit {
+	return &Quit{}
 }
 
-func (c *CommandQuit) Execute() error { return nil }
-func (c *CommandQuit) Undo() error    { return nil }
+func (c *Quit) Execute() error { return nil }
+func (c *Quit) Undo() error    { return nil }

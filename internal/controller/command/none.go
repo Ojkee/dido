@@ -1,10 +1,10 @@
 package command
 
-type CommandNone struct{}
+type None struct{}
 
-func NewCommandNone() *CommandNone {
-	return &CommandNone{}
+func NewNone() *None {
+	return &None{}
 }
 
-func (c *CommandNone) Execute() error { return nil }
-func (c *CommandNone) Undo() error    { return nil }
+func (c *None) Execute() error { return nil }
+func (c *None) Undo() error    { return nil }

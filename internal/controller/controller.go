@@ -10,27 +10,59 @@ import (
 	"dido/internal/textstorage"
 )
 
-type Controller struct{}
-
-func NewController() Controller {
-	return Controller{}
+type Controller struct {
+	DEBUG_KEY sdl.Keycode
 }
 
-func (*Controller) GetCommand(
+func NewController() Controller {
+	return Controller{
+		DEBUG_KEY: sdl.K_F4,
+	}
+}
+
+func (c *Controller) GetCommand(
 	event sdl.Event,
 	text textstorage.TextStorage,
 	cursor *cursor_api.Cursor,
 ) command.Command {
-	var cmd command.Command
 	switch e := event.(type) {
 	case *sdl.QuitEvent:
-		cmd = command.NewCommandQuit()
+		return command.NewQuit()
+	case *sdl.KeyboardEvent:
+		if cmd := c.specialSignCommand(e, text, cursor); cmd != nil {
+			return cmd
+		}
 	case *sdl.TextInputEvent:
-		letter := bytes.Runes(e.Text[:1])[0]
-		cmd = command.NewCommandInsert(letter, &text, cursor)
+		return command.NewInsert(runeOfBytes(e.Text), &text, cursor)
 	default:
-		cmd = command.NewCommandNone()
+		return command.NewNone()
 	}
 
-	return cmd
+	return command.NewNone()
+}
+
+func runeOfBytes(b [32]byte) rune {
+	return bytes.Runes(b[:3])[0] // rune <-> `3` UTF8 bytes
+}
+
+func (c *Controller) specialSignCommand(
+	event *sdl.KeyboardEvent,
+	text textstorage.TextStorage,
+	cursor *cursor_api.Cursor,
+) command.Command {
+	commandMap := map[sdl.Keycode]command.Command{
+		sdl.K_RETURN:    command.NewInsert('\n', &text, cursor),
+		sdl.K_TAB:       command.NewInsert('\t', &text, cursor),
+		sdl.K_BACKSPACE: command.NewDelete(&text, cursor),
+		c.DEBUG_KEY:     command.NewLog(*text.Get()),
+	}
+
+	switch event.GetType() {
+	case sdl.KEYDOWN:
+		key := event.Keysym.Sym
+		if cmd, ok := commandMap[key]; ok {
+			return cmd
+		}
+	}
+	return nil
 }

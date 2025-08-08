@@ -1,8 +1,6 @@
 package editor
 
 import (
-	"fmt"
-
 	"github.com/veandco/go-sdl2/sdl"
 
 	controller_api "dido/internal/controller"
@@ -40,13 +38,12 @@ func (e *Editor) Run() {
 
 		cmd := e.controller.GetCommand(event, &e.buffer, &e.cursor)
 		switch cmd.(type) {
-		case *command.CommandQuit:
+		case *command.Quit:
 			e.run = false
-		case *command.CommandNone:
+		case *command.None:
 			break
 		default:
 			cmd.Execute()
-			fmt.Println(e.buffer) // TODO: remove
 		}
 
 		e.view.Draw()

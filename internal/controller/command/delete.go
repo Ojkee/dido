@@ -5,37 +5,41 @@ import (
 	"dido/internal/textstorage"
 )
 
-type Insert struct {
+type Delete struct {
 	idx    int
 	text   *textstorage.TextStorage
 	cursor *cursor_api.Cursor
 	r      rune
 }
 
-func NewInsert(
-	r rune,
+func NewDelete(
 	text *textstorage.TextStorage,
 	cursor *cursor_api.Cursor,
-) *Insert {
-	return &Insert{
+) *Delete {
+	return &Delete{
 		idx:    cursor.CurrentPos(),
-		r:      r,
 		text:   text,
 		cursor: cursor,
 	}
 }
 
-func (c *Insert) Execute() error {
-	err := (*c.text).Insert(c.r, c.idx)
+func (c *Delete) Execute() error {
+	r, err := (*c.text).At(c.idx)
 	if err != nil {
 		return err
 	}
-	c.cursor.MoveRight()
+	c.r = r
+
+	err = (*c.text).Delete(c.idx)
+	if err != nil {
+		return err
+	}
+	c.cursor.MoveLeft()
 	return nil
 }
 
-func (c *Insert) Undo() error {
-	err := (*c.text).Delete(c.idx)
+func (c *Delete) Undo() error {
+	err := (*c.text).Insert(c.r, c.idx)
 	if err != nil {
 		return err
 	}

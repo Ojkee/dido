@@ -1,6 +1,20 @@
 package view
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"log"
+	"runtime"
+
+	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
+	_ "github.com/veandco/go-sdl2/ttf"
+
+	_ "dido/internal/cursor"
+	_ "dido/internal/textstorage"
+)
+
+func init() {
+	runtime.LockOSThread()
+}
 
 type View struct {
 	window *sdl.Window
@@ -10,6 +24,12 @@ type View struct {
 }
 
 func NewView() View {
+	if err := sdl.Init(sdl.INIT_VIDEO); err != nil {
+		log.Fatalf("SDL Init: %v", err)
+	}
+	if err := ttf.Init(); err != nil {
+		log.Fatalf("TTF Init: %v", err)
+	}
 	window, err := sdl.CreateWindow(
 		"Dido",
 		sdl.WINDOWPOS_CENTERED,
@@ -32,8 +52,18 @@ func (v *View) Draw() error {
 	if err != nil {
 		return err
 	}
+	defer surface.Free()
 
 	v.drawBackground(surface)
+
+	// TEXT
+	// bufferUint32 := sdl.MapRGB(
+	// 	surface.Format,
+	// 	v.bufferColor.R,
+	// 	v.bufferColor.G,
+	// 	v.bufferColor.B,
+	// )
+	// _ = surface.FillRect(nil, bufferUint32)
 	return nil
 }
 
@@ -54,5 +84,7 @@ func (v *View) Update() error {
 
 func (v *View) Close() error {
 	err := v.window.Destroy()
+	sdl.Quit()
+	ttf.Quit()
 	return err
 }
