@@ -33,7 +33,7 @@ func (e *Editor) Run() {
 	for e.run {
 		event := sdl.WaitEvent()
 
-		cmd := e.controller.GetCommand(&e.ctx, event)
+		cmd := e.controller.Command(&e.ctx, event)
 		switch cmd.(type) {
 		case *command.Quit:
 			e.run = false

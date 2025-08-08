@@ -10,16 +10,16 @@ import (
 )
 
 type Controller struct {
-	DEBUG_KEY sdl.Keycode
+	debugKey sdl.Keycode
 }
 
 func NewController() Controller {
 	return Controller{
-		DEBUG_KEY: sdl.K_F4,
+		debugKey: sdl.K_F4,
 	}
 }
 
-func (c *Controller) GetCommand(
+func (c *Controller) Command(
 	ctx *context.Context,
 	event sdl.Event,
 ) command.Command {
@@ -32,8 +32,6 @@ func (c *Controller) GetCommand(
 		}
 	case *sdl.TextInputEvent:
 		return command.NewInsert(ctx, runeOfBytes(e.Text))
-	default:
-		return command.NewNone()
 	}
 
 	return command.NewNone()
@@ -47,18 +45,17 @@ func (c *Controller) specialSignCommand(
 	ctx *context.Context,
 	event *sdl.KeyboardEvent,
 ) command.Command {
-	commandMap := map[sdl.Keycode]command.Command{
-		sdl.K_RETURN:    command.NewInsert(ctx, '\n'),
-		sdl.K_TAB:       command.NewInsert(ctx, '\t'),
-		sdl.K_BACKSPACE: command.NewDelete(ctx),
-		c.DEBUG_KEY:     command.NewLog(*ctx.Buffer.Get()),
-	}
-
 	switch event.GetType() {
 	case sdl.KEYDOWN:
-		key := event.Keysym.Sym
-		if cmd, ok := commandMap[key]; ok {
-			return cmd
+		switch event.Keysym.Sym {
+		case sdl.K_RETURN:
+			return command.NewInsert(ctx, '\n')
+		case sdl.K_TAB:
+			return command.NewInsert(ctx, '\t')
+		case sdl.K_BACKSPACE:
+			return command.NewDelete(ctx)
+		case c.debugKey:
+			return command.NewLog(*ctx.Buffer.Get())
 		}
 	}
 	return nil
