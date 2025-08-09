@@ -3,6 +3,7 @@ package editor
 import (
 	"github.com/veandco/go-sdl2/sdl"
 
+	config_api "dido/internal/config"
 	"dido/internal/context"
 	controller_api "dido/internal/controller"
 	"dido/internal/controller/command"
@@ -10,6 +11,7 @@ import (
 )
 
 type Editor struct {
+	config     *config_api.Config
 	view       view_api.View
 	controller controller_api.Controller
 	run        bool
@@ -17,8 +19,10 @@ type Editor struct {
 }
 
 func NewEditor() Editor {
+	config := config_api.NewConfig()
 	return Editor{
-		view:       view_api.NewView(),
+		config:     config,
+		view:       view_api.NewView(config),
 		controller: controller_api.NewController(),
 		run:        true,
 		ctx:        context.NewContext(),

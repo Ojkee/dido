@@ -8,6 +8,7 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 	_ "github.com/veandco/go-sdl2/ttf"
 
+	config_api "dido/internal/config"
 	_ "dido/internal/cursor"
 	_ "dido/internal/textstorage"
 )
@@ -17,18 +18,16 @@ func init() {
 }
 
 type View struct {
-	window *sdl.Window
-
+	window      *sdl.Window
+	config      *config_api.Config
+	font        *ttf.Font
 	bgColor     sdl.Color
 	bufferColor sdl.Color
 }
 
-func NewView() View {
+func NewView(config *config_api.Config) View {
 	if err := sdl.Init(sdl.INIT_VIDEO); err != nil {
 		log.Fatalf("SDL Init: %v", err)
-	}
-	if err := ttf.Init(); err != nil {
-		log.Fatalf("TTF Init: %v", err)
 	}
 	window, err := sdl.CreateWindow(
 		"Dido",
@@ -40,8 +39,21 @@ func NewView() View {
 	if err != nil {
 		panic(err)
 	}
+	if err := ttf.Init(); err != nil {
+		log.Fatalf("TTF Init: %v", err)
+	}
+	fontPath, err := config.FontPath()
+	if err != nil {
+		log.Fatalf("Font Path Loading: %v", err)
+	}
+	font, err := ttf.OpenFont(fontPath, 24)
+	if err != nil {
+		log.Fatalf("Open font: %v", err)
+	}
 	return View{
 		window:      window,
+		config:      config,
+		font:        font,
 		bgColor:     sdl.Color{R: 51, G: 51, B: 51},
 		bufferColor: sdl.Color{R: 255, G: 248, B: 231},
 	}
@@ -52,6 +64,7 @@ func (v *View) Draw() error {
 	if err != nil {
 		return err
 	}
+
 	defer surface.Free()
 
 	v.drawBackground(surface)
@@ -83,8 +96,9 @@ func (v *View) Update() error {
 }
 
 func (v *View) Close() error {
+	v.font.Close()
+	ttf.Quit()
 	err := v.window.Destroy()
 	sdl.Quit()
-	ttf.Quit()
 	return err
 }
