@@ -47,7 +47,6 @@ func (e *Editor) Run() {
 			cmd.Execute()
 		}
 
-		e.view.Draw()
-		e.view.Update()
+		e.view.Draw(&e.ctx)
 	}
 }

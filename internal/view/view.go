@@ -9,6 +9,7 @@ import (
 	_ "github.com/veandco/go-sdl2/ttf"
 
 	config_api "dido/internal/config"
+	"dido/internal/context"
 	_ "dido/internal/cursor"
 	_ "dido/internal/textstorage"
 )
@@ -18,7 +19,7 @@ func init() {
 }
 
 type View struct {
-	window      *sdl.Window
+	renderer    *sdl.Renderer
 	config      *config_api.Config
 	font        *ttf.Font
 	bgColor     sdl.Color
@@ -37,7 +38,11 @@ func NewView(config *config_api.Config) View {
 		sdl.WINDOW_SHOWN,
 	)
 	if err != nil {
-		panic(err)
+		log.Fatalf("SDL Window Init: %v", err)
+	}
+	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
+	if err != nil {
+		log.Fatalf("SDL Renderer Init: %v", err)
 	}
 	if err := ttf.Init(); err != nil {
 		log.Fatalf("TTF Init: %v", err)
@@ -46,12 +51,12 @@ func NewView(config *config_api.Config) View {
 	if err != nil {
 		log.Fatalf("Font Path Loading: %v", err)
 	}
-	font, err := ttf.OpenFont(fontPath, 24)
+	font, err := ttf.OpenFont(fontPath, 20)
 	if err != nil {
 		log.Fatalf("Open font: %v", err)
 	}
 	return View{
-		window:      window,
+		renderer:    renderer,
 		config:      config,
 		font:        font,
 		bgColor:     sdl.Color{R: 51, G: 51, B: 51},
@@ -59,46 +64,43 @@ func NewView(config *config_api.Config) View {
 	}
 }
 
-func (v *View) Draw() error {
-	surface, err := v.window.GetSurface()
+func (v *View) Draw(ctx *context.Context) error {
+	// TEXT
+	v.renderer.SetDrawColor(v.bgColor.R, v.bgColor.G, v.bgColor.B, 255)
+	v.renderer.Clear()
+
+	text := string(*ctx.Buffer.Get())
+	err := v.drawText(&text, 0, 0)
+
+	v.renderer.Present()
+	return err
+}
+
+func (v *View) drawText(line *string, x int32, y int32) error {
+	textSurface, err := v.font.RenderUTF8Solid(*line, v.bufferColor)
 	if err != nil {
 		return err
 	}
+	defer textSurface.Free()
 
-	defer surface.Free()
+	textTexture, err := v.renderer.CreateTextureFromSurface(textSurface)
+	if err != nil {
+		return err
+	}
+	defer textTexture.Destroy()
 
-	v.drawBackground(surface)
+	dstRect := sdl.Rect{X: x, Y: y, W: textSurface.W, H: textSurface.H}
+	if err := v.renderer.Copy(textTexture, nil, &dstRect); err != nil {
+		return err
+	}
 
-	// TEXT
-	// bufferUint32 := sdl.MapRGB(
-	// 	surface.Format,
-	// 	v.bufferColor.R,
-	// 	v.bufferColor.G,
-	// 	v.bufferColor.B,
-	// )
-	// _ = surface.FillRect(nil, bufferUint32)
 	return nil
-}
-
-func (v *View) drawBackground(surface *sdl.Surface) {
-	bgUint32 := sdl.MapRGB(
-		surface.Format,
-		v.bgColor.R,
-		v.bgColor.G,
-		v.bgColor.B,
-	)
-	_ = surface.FillRect(nil, bgUint32)
-}
-
-func (v *View) Update() error {
-	err := v.window.UpdateSurface()
-	return err
 }
 
 func (v *View) Close() error {
 	v.font.Close()
 	ttf.Quit()
-	err := v.window.Destroy()
+	err := v.renderer.Clear()
 	sdl.Quit()
 	return err
 }

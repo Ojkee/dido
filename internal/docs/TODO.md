@@ -2,7 +2,7 @@
 
 ## Roadmap
 - [x] Appending Uppercase
-- [ ] Display letters on the screen
+- [x] Display letters on the screen
 - [ ] Undo/Redo 
     - [ ] Display tree
     - [ ] Show differences on different branches
@@ -11,19 +11,21 @@
 - [ ] Config 
     - [ ] Theme
     - [ ] Key mappings
-    - [ ] Custom font
+    - [x] Custom font
 - [ ] Selection 
 - [ ] Find phrase
 - [ ] Replace phrase
 
 ## Bugs
 - [x] Delete Command panics
+- [ ] Better handling paths, program should work regardless of working directory 
 
 ## Extra
 - [ ] Coloring buffer
 
-
 ## Current tasks
-- [ ] Basic char displaying
+- [ ] Handling new lines and tabs
+- [x] Basic char displaying
+- [x] Load font
 - [x] Refacotor ctx
 - [x] Fix delete
