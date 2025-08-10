@@ -91,7 +91,7 @@ func (v *View) drawText(buffer textstorage.TextStorage, xOffset int32, yOffset i
 
 		dstRect := sdl.Rect{
 			X: xOffset,
-			Y: yOffset + int32(int32(i)*textSurface.H),
+			Y: yOffset + int32(i)*textSurface.H,
 			W: textSurface.W,
 			H: textSurface.H,
 		}

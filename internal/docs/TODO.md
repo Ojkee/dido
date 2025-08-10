@@ -17,8 +17,9 @@
 - [ ] Replace phrase
 
 ## Bugs
-- [x] Delete Command panics
+- [ ] Multiple new lines in row prevent rendering lines
 - [ ] Better handling paths, program should work regardless of working directory 
+- [x] Delete Command panics
 
 ## Extra
 - [ ] Coloring buffer

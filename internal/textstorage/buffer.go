@@ -49,10 +49,6 @@ func (b *Buffer) At(idx int) (rune, error) {
 	return value, nil
 }
 
-func (b *Buffer) Get() *[]rune {
-	return &b.content
-}
-
 func (b *Buffer) AsLines() *[]string {
 	if !b.changed {
 		return &b.linesCache

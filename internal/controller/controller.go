@@ -55,7 +55,7 @@ func (c *Controller) specialSignCommand(
 		case sdl.K_BACKSPACE:
 			return command.NewDelete(ctx)
 		case c.debugKey:
-			return command.NewLog(*ctx.Buffer.Get())
+			return command.NewLog(*ctx.Buffer.AsLines())
 		}
 	}
 	return nil
