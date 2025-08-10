@@ -11,6 +11,7 @@ import (
 	config_api "dido/internal/config"
 	"dido/internal/context"
 	_ "dido/internal/cursor"
+	"dido/internal/textstorage"
 	_ "dido/internal/textstorage"
 )
 
@@ -65,33 +66,38 @@ func NewView(config *config_api.Config) View {
 }
 
 func (v *View) Draw(ctx *context.Context) error {
-	// TEXT
 	v.renderer.SetDrawColor(v.bgColor.R, v.bgColor.G, v.bgColor.B, 255)
 	v.renderer.Clear()
 
-	text := string(*ctx.Buffer.Get())
-	err := v.drawText(&text, 0, 0)
+	err := v.drawText(&ctx.Buffer, 0, 0)
 
 	v.renderer.Present()
 	return err
 }
 
-func (v *View) drawText(line *string, x int32, y int32) error {
-	textSurface, err := v.font.RenderUTF8Solid(*line, v.bufferColor)
-	if err != nil {
-		return err
-	}
-	defer textSurface.Free()
+func (v *View) drawText(buffer textstorage.TextStorage, xOffset int32, yOffset int32) error {
+	for i, line := range *buffer.AsLines() {
+		textSurface, err := v.font.RenderUTF8Solid(line, v.bufferColor)
+		if err != nil {
+			return err
+		}
+		defer textSurface.Free()
 
-	textTexture, err := v.renderer.CreateTextureFromSurface(textSurface)
-	if err != nil {
-		return err
-	}
-	defer textTexture.Destroy()
+		textTexture, err := v.renderer.CreateTextureFromSurface(textSurface)
+		if err != nil {
+			return err
+		}
+		defer textTexture.Destroy()
 
-	dstRect := sdl.Rect{X: x, Y: y, W: textSurface.W, H: textSurface.H}
-	if err := v.renderer.Copy(textTexture, nil, &dstRect); err != nil {
-		return err
+		dstRect := sdl.Rect{
+			X: xOffset,
+			Y: yOffset + int32(int32(i)*textSurface.H),
+			W: textSurface.W,
+			H: textSurface.H,
+		}
+		if err := v.renderer.Copy(textTexture, nil, &dstRect); err != nil {
+			return err
+		}
 	}
 
 	return nil

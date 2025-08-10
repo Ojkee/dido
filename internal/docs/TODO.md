@@ -24,7 +24,8 @@
 - [ ] Coloring buffer
 
 ## Current tasks
-- [ ] Handling new lines and tabs
+- [ ] Handling tabs
+- [x] Handling new lines
 - [x] Basic char displaying
 - [x] Load font
 - [x] Refacotor ctx

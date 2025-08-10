@@ -7,18 +7,19 @@ type TextStorage interface {
 	Delete(int) error
 	At(int) (rune, error)
 	Get() *[]rune
+	AsLines() *[]string
 }
 
 type ErrorOutOfRange struct {
-	ctx string
+	msg string
 }
 
-func NewErrorOutOfRange(ctx string) ErrorOutOfRange {
+func NewErrorOutOfRange(msg string) ErrorOutOfRange {
 	return ErrorOutOfRange{
-		ctx: ctx,
+		msg: msg,
 	}
 }
 
 func (e ErrorOutOfRange) Error() string {
-	return fmt.Sprintf("Out of range at: %s", e.ctx)
+	return fmt.Sprintf("Out of range at: %s", e.msg)
 }
